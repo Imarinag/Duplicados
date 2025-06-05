@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: duplicados-ok
+    env: node
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    autoDeploy: true
+    envVars:
+      - key: AIRTABLE_API_KEY
+        sync: false
