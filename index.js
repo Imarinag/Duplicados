@@ -3,8 +3,19 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const app = express();
+
 app.use(express.json());
 
+// ✅ Middleware para autenticar con INTERNAL_API_KEY
+app.use((req, res, next) => {
+  const apiKey = req.headers['authorization'];
+  if (apiKey !== `Bearer ${process.env.INTERNAL_API_KEY}`) {
+    return res.status(403).json({ error: 'Unauthorized' });
+  }
+  next();
+});
+
+// 🔧 Variables de entorno
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TABLE_NAME = process.env.AIRTABLE_TABLE_NAME;
 const API_KEY = process.env.AIRTABLE_API_KEY;
@@ -15,6 +26,7 @@ const headers = {
   'Content-Type': 'application/json'
 };
 
+// 📄 Listar contactos
 app.get('/contactos', async (req, res) => {
   try {
     const { data } = await axios.get(AIRTABLE_URL, { headers });
@@ -24,6 +36,7 @@ app.get('/contactos', async (req, res) => {
   }
 });
 
+// ➕ Crear contacto
 app.post('/contactos', async (req, res) => {
   try {
     const { fields } = req.body;
@@ -34,6 +47,7 @@ app.post('/contactos', async (req, res) => {
   }
 });
 
+// 🛠️ Actualizar contacto
 app.put('/contactos/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -45,6 +59,7 @@ app.put('/contactos/:id', async (req, res) => {
   }
 });
 
+// ❌ Eliminar contacto
 app.delete('/contactos/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -55,5 +70,7 @@ app.delete('/contactos/:id', async (req, res) => {
   }
 });
 
+// ✅ Puerto de escucha
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor escuchando en puerto ${PORT}`));
+
