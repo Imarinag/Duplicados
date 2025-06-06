@@ -1,4 +1,4 @@
-// server.js
+// index.js
 require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
@@ -6,7 +6,7 @@ const app = express();
 
 app.use(express.json());
 
-// ✅ Middleware para autenticar con INTERNAL_API_KEY
+// Middleware de autenticación
 app.use((req, res, next) => {
   const apiKey = req.headers['authorization'];
   if (apiKey !== `Bearer ${process.env.INTERNAL_API_KEY}`) {
@@ -15,7 +15,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// 🔧 Variables de entorno
+// Variables de entorno
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
 const TABLE_NAME = process.env.AIRTABLE_TABLE_NAME;
 const API_KEY = process.env.AIRTABLE_API_KEY;
@@ -26,8 +26,8 @@ const headers = {
   'Content-Type': 'application/json'
 };
 
-// 📄 Listar contactos
-app.get('/contactos', async (req, res) => {
+// Listar contactos
+app.get('/Contactos', async (req, res) => {
   try {
     const { data } = await axios.get(AIRTABLE_URL, { headers });
     res.json(data.records);
@@ -36,8 +36,8 @@ app.get('/contactos', async (req, res) => {
   }
 });
 
-// ➕ Crear contacto
-app.post('/contactos', async (req, res) => {
+// Crear contacto
+app.post('/Contactos', async (req, res) => {
   try {
     const { fields } = req.body;
     const { data } = await axios.post(AIRTABLE_URL, { fields }, { headers });
@@ -47,8 +47,8 @@ app.post('/contactos', async (req, res) => {
   }
 });
 
-// 🛠️ Actualizar contacto
-app.put('/contactos/:id', async (req, res) => {
+// Actualizar contacto
+app.patch('/Contacts/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { fields } = req.body;
@@ -59,8 +59,8 @@ app.put('/contactos/:id', async (req, res) => {
   }
 });
 
-// ❌ Eliminar contacto
-app.delete('/contactos/:id', async (req, res) => {
+// Eliminar contacto
+app.delete('/Contacts/:id', async (req, res) => {
   try {
     const { id } = req.params;
     await axios.delete(`${AIRTABLE_URL}/${id}`, { headers });
@@ -70,7 +70,20 @@ app.delete('/contactos/:id', async (req, res) => {
   }
 });
 
-// ✅ Puerto de escucha
+// Detectar y eliminar duplicados (ruta necesaria para el GPT)
+app.post('/Contactos/duplicados', async (req, res) => {
+  const verificar = req.body.verificar;
+  if (!verificar) {
+    return res.status(400).json({ error: 'Falta el campo verificar' });
+  }
+  try {
+    // Aquí se implementaría la lógica real de detección de duplicados
+    res.status(200).json({ mensaje: 'Duplicados gestionados exitosamente (demo)' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al procesar duplicados' });
+  }
+});
+
+// Puerto de escucha
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor escuchando en puerto ${PORT}`));
-
