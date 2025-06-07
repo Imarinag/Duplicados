@@ -6,10 +6,10 @@ const app = express();
 
 app.use(express.json());
 
-// ✅ Middleware de autenticación correcto
+// ✅ Middleware corregido sin Bearer
 app.use((req, res, next) => {
   const apiKey = req.header("Authorization");
-  const expectedApiKey = `Bearer ${process.env.INTERNAL_API_KEY}`;
+  const expectedApiKey = process.env.INTERNAL_API_KEY;
 
   if (!apiKey || apiKey !== expectedApiKey) {
     return res.status(401).json({ error: "Unauthorized" });
@@ -17,6 +17,7 @@ app.use((req, res, next) => {
 
   next();
 });
+
 
 // 🌍 Variables de entorno
 const BASE_ID = process.env.AIRTABLE_BASE_ID;
