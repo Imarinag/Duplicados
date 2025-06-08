@@ -10,7 +10,6 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Variables de entorno
 const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_ID } = process.env
 
 const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`
@@ -42,4 +41,15 @@ app.post('/contactos', async (req, res) => {
     const status = error.response?.status || 500
     const message = error.response?.data || error.message
     console.error('Error al insertar en Airtable:', message)
-    res.status(status).json({ error: m
+    res.status(status).json({ error: message })
+  }
+})
+
+app.get('/', (req, res) => {
+  res.send('API de creación de contactos conectada a Airtable.')
+})
+
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+  console.log(`Servidor activo en puerto ${PORT}`)
+})
