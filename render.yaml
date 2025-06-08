@@ -1,15 +1,7 @@
-services:
-  - type: web
-    name: duplicados-ok
-    env: node
-    plan: free
-    buildCommand: "npm install"
-    startCommand: "node index.js"
-    autoDeploy: true
-    envVars:
-      - key: AIRTABLE_API_KEY
-        value: patrF3QPNf9lrm8lc.796b9af6623c664d06bedc18faf1c446dafa6bbdfdeb49dbfc33988b9db0327f
-      - key: BASE_ID
-        value: app5UnTdKfNX1VAhm
-      - key: TABLE_ID
-        value: tbltuIqmCt11Jl8T8
+envVars:
+  - key: AIRTABLE_API_KEY
+    value: patrF3QPNf9lrm8lc.796b9af6623c664d06bedc18faf1c446dafa6bbdfdeb49dbfc33988b9db0327f
+  - key: BASE_ID
+    value: app5UnTdKfNX1VAhm
+  - key: TABLE_ID
+    value: tbltuIqmCt11Jl8T8  # <--- MUY IMPORTANTE: este es el ID de la tabla, NO el nombre
