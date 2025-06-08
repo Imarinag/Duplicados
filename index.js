@@ -13,7 +13,8 @@ app.use(bodyParser.json());
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 const BASE_ID = process.env.BASE_ID;
 const TABLE_ID = process.env.TABLE_ID;
-const AIRTABLE_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_ID}`;
+const AIRTABLE_URL = `https://api.airtable.com/v0/${BASE_ID}/Contactos`;
+
 
 // Crear contacto
 app.post('/contactos', async (req, res) => {
