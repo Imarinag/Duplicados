@@ -11,9 +11,9 @@ app.use(cors())
 app.use(express.json())
 
 // Airtable config desde variables de entorno
-const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_NAME } = process.env
+const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_ID } = process.env
 
-const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`
+const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`
 const headers = {
   Authorization: `Bearer ${AIRTABLE_API_KEY}`,
   'Content-Type': 'application/json',
@@ -27,5 +27,4 @@ app.post('/contactos', async (req, res) => {
       return res.status(400).json({ error: 'Missing or invalid "fields" object in request body.' })
     }
 
-    const response = await axios.post(
-      airtableUrl,
+    con
