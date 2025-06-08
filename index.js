@@ -11,45 +11,42 @@ app.use(cors())
 app.use(express.json())
 
 const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_ID } = process.env
-
 const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`
+
 const headers = {
   Authorization: `Bearer ${AIRTABLE_API_KEY}`,
   'Content-Type': 'application/json',
 }
 
+// Crear un nuevo contacto
 app.post('/contactos', async (req, res) => {
   try {
     const { fields } = req.body
-
     if (!fields || typeof fields !== 'object') {
       return res.status(400).json({ error: 'Missing or invalid "fields" object in request body.' })
     }
 
-    const response = await axios.post(
-      airtableUrl,
-      { fields },
-      { headers }
-    )
-
-    res.status(200).json({
-      message: 'Contacto creado correctamente en Airtable.',
-      airtableId: response.data.id,
-      createdTime: response.data.createdTime
-    })
+    const response = await axios.post(airtableUrl, { fields }, { headers })
+    res.status(200).json(response.data)
   } catch (error) {
-    const status = error.response?.status || 500
-    const message = error.response?.data || error.message
-    console.error('Error al insertar en Airtable:', message)
-    res.status(status).json({ error: message })
+    res.status(error.response?.status || 500).json({ error: error.response?.data || error.message })
   }
 })
 
-app.get('/', (req, res) => {
-  res.send('API de creación de contactos conectada a Airtable.')
+// Obtener todos los contactos
+app.get('/contactos', async (req, res) => {
+  try {
+    const response = await axios.get(airtableUrl, { headers })
+    res.status(200).json(response.data.records)
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener contactos desde Airtable' })
+  }
 })
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-  console.log(`Servidor activo en puerto ${PORT}`)
-})
+// Obtener un contacto por ID
+app.get('/contactos/:id', async (req, res) => {
+  try {
+    const response = await axios.get(`${airtableUrl}/${req.params.id}`, { headers })
+    res.status(200).json(response.d
+
+
