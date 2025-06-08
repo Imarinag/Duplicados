@@ -1,91 +1,41 @@
 // index.js optimizado 
-require('dotenv').config();
-const express = require('express');
-const axios = require('axios');
-const app = express();
+import express from 'express'
+import axios from 'axios'
+import dotenv from 'dotenv'
+import cors from 'cors'
 
-app.use(express.json());
+dotenv.config()
 
-// 🔐 Autenticación
-app.use((req, res, next) => {
-  const apiKey = req.header("Authorization");
-  const expectedApiKey = `Bearer ${process.env.INTERNAL_API_KEY}`;
+const app = express()
+app.use(cors())
+app.use(express.json())
 
-  if (!apiKey || apiKey !== expectedApiKey) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-  next();
-});
+const airtableEndpoint = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${encodeURIComponent(process.env.AIRTABLE_TABLE_NAME)}`
+const airtableHeaders = {
+  Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
+  'Content-Type': 'application/json',
+}
 
-// 🌍 Datos del entorno
-const BASE_ID = process.env.AIRTABLE_BASE_ID;
-const TABLE_NAME = process.env.AIRTABLE_TABLE_NAME; // e.g. Contactos
-const API_KEY = process.env.AIRTABLE_API_KEY;
-const AIRTABLE_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
-
-const headers = {
-  Authorization: `Bearer ${API_KEY}`,
-  'Content-Type': 'application/json'
-};
-
-// Listar contactos
-app.get('/contactos', async (req, res) => {
+app.post('/crearContacto', async (req, res) => {
   try {
-    const { filterByFormula } = req.query;
-    const url = filterByFormula
-      ? `${AIRTABLE_URL}?filterByFormula=${encodeURIComponent(filterByFormula)}`
-      : AIRTABLE_URL;
-    const response = await axios.get(url, { headers });
-    res.json(response.data.records);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const { fields } = req.body
+    const response = await axios.post(
+      airtableEndpoint,
+      { fields },
+      { headers: airtableHeaders }
+    )
+    res.status(200).json(response.data)
+  } catch (error) {
+    console.error(error.response?.data || error.message)
+    res.status(500).json({ error: error.response?.data || error.message })
   }
-});
+})
 
-// Crear contacto
-app.post('/contactos', async (req, res) => {
-  try {
-    const { fields } = req.body;
-    const response = await axios.post(AIRTABLE_URL, { fields }, { headers });
-    res.json(response.data);
-  } catch (err) {
-    res.status(500).json({ error: err.response?.data || err.message });
-  }
-});
+app.get('/', (req, res) => {
+  res.send('API para crear contactos en Airtable está activa.')
+})
 
-// Actualizar contacto
-app.patch('/contactos/:recordId', async (req, res) => {
-  try {
-    const { recordId } = req.params;
-    const { fields } = req.body;
-    const url = `${AIRTABLE_URL}/${recordId}`;
-    const response = await axios.patch(url, { fields }, { headers });
-    res.json(response.data);
-  } catch (err) {
-    res.status(500).json({ error: err.response?.data || err.message });
-  }
-});
-
-// Eliminar contacto
-app.delete('/contactos/:recordId', async (req, res) => {
-  try {
-    const { recordId } = req.params;
-    const url = `${AIRTABLE_URL}/${recordId}`;
-    await axios.delete(url, { headers });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.response?.data || err.message });
-  }
-});
-
-// Detectar duplicados
-app.post('/contactos/duplicados', async (req, res) => {
-  // Aquí va tu lógica de duplicados
-  res.json({ status: 'Revisado' });
-});
-
-// Puerto
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${PORT}`));
-
-
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`)
+})
