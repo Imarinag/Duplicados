@@ -10,32 +10,38 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-const airtableEndpoint = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${encodeURIComponent(process.env.AIRTABLE_TABLE_NAME)}`
+const airtableBaseId = process.env.AIRTABLE_BASE_ID
+const airtableApiKey = process.env.AIRTABLE_API_KEY
+const airtableTable = process.env.AIRTABLE_TABLE_NAME
+
+const airtableEndpoint = `https://api.airtable.com/v0/${airtableBaseId}/${encodeURIComponent(airtableTable)}`
 const airtableHeaders = {
-  Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
+  Authorization: `Bearer ${airtableApiKey}`,
   'Content-Type': 'application/json',
 }
 
-app.post('/crearContacto', async (req, res) => {
+app.post('/contactos', async (req, res) => {
   try {
     const { fields } = req.body
+
     const response = await axios.post(
       airtableEndpoint,
       { fields },
       { headers: airtableHeaders }
     )
+
     res.status(200).json(response.data)
   } catch (error) {
-    console.error(error.response?.data || error.message)
+    console.error('Airtable error:', error.response?.data || error.message)
     res.status(500).json({ error: error.response?.data || error.message })
   }
 })
 
 app.get('/', (req, res) => {
-  res.send('API para crear contactos en Airtable está activa.')
+  res.send('API de contactos operativa en Render.')
 })
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`)
+  console.log(`Servidor activo en puerto ${PORT}`)
 })
