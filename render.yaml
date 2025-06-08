@@ -1,11 +1,20 @@
 services:
   - type: web
-    name: duplicados-ok
+    name: famousai-gestor-contactos
     env: node
     plan: free
-    buildCommand: "npm install"
-    startCommand: "npm start"
-    autoDeploy: true
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    runtime: node
+    branch: main
+    repo: https://github.com/claudiaaspiri/famousai-api-airtable
     envVars:
       - key: AIRTABLE_API_KEY
+        sync: false
+      - key: AIRTABLE_BASE_ID
+        sync: false
+      - key: AIRTABLE_TABLE_NAME
+        sync: false
+      - key: INTERNAL_API_KEY
         sync: false
