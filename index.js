@@ -12,13 +12,12 @@ app.use(express.json())
 
 const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_ID } = process.env
 const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`
-
 const headers = {
   Authorization: `Bearer ${AIRTABLE_API_KEY}`,
   'Content-Type': 'application/json',
 }
 
-// Crear un nuevo contacto
+// Crear nuevo contacto
 app.post('/contactos', async (req, res) => {
   try {
     const { fields } = req.body
@@ -27,7 +26,7 @@ app.post('/contactos', async (req, res) => {
     }
 
     const response = await axios.post(airtableUrl, { fields }, { headers })
-    res.status(200).json(response.data)
+    res.status(201).json(response.data)
   } catch (error) {
     res.status(error.response?.status || 500).json({ error: error.response?.data || error.message })
   }
@@ -47,6 +46,53 @@ app.get('/contactos', async (req, res) => {
 app.get('/contactos/:id', async (req, res) => {
   try {
     const response = await axios.get(`${airtableUrl}/${req.params.id}`, { headers })
-    res.status(200).json(response.d
+    res.status(200).json(response.data)
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data || error.message })
+  }
+})
+
+// Reemplazar un contacto completamente (PUT)
+app.put('/contactos/:id', async (req, res) => {
+  try {
+    const { fields } = req.body
+    const response = await axios.put(`${airtableUrl}/${req.params.id}`, { fields }, { headers })
+    res.status(200).json(response.data)
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data || error.message })
+  }
+})
+
+// Actualizar parcialmente un contacto (PATCH)
+app.patch('/contactos/:id', async (req, res) => {
+  try {
+    const { fields } = req.body
+    const response = await axios.patch(`${airtableUrl}/${req.params.id}`, { fields }, { headers })
+    res.status(200).json(response.data)
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data || error.message })
+  }
+})
+
+// Eliminar un contacto
+app.delete('/contactos/:id', async (req, res) => {
+  try {
+    await axios.delete(`${airtableUrl}/${req.params.id}`, { headers })
+    res.status(200).json({ deleted: true, id: req.params.id })
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.response?.data || error.message })
+  }
+})
+
+// Ruta raíz
+app.get('/', (req, res) => {
+  res.send('API completa de gestión de contactos Airtable está activa.')
+})
+
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en el puerto ${PORT}`)
+})
+
 
 
