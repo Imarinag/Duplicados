@@ -10,39 +10,22 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-const airtableBaseId = process.env.AIRTABLE_BASE_ID
-const airtableApiKey = process.env.AIRTABLE_API_KEY
-const airtableTable = process.env.AIRTABLE_TABLE_NAME
+// Airtable config desde variables de entorno
+const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_NAME } = process.env
 
-const airtableEndpoint = `https://api.airtable.com/v0/${airtableBaseId}/${encodeURIComponent(airtableTable)}`
-const airtableHeaders = {
-  Authorization: `Bearer ${airtableApiKey}`,
+const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`
+const headers = {
+  Authorization: `Bearer ${AIRTABLE_API_KEY}`,
   'Content-Type': 'application/json',
 }
 
+// Ruta POST /contactos
 app.post('/contactos', async (req, res) => {
   try {
     const { fields } = req.body
+    if (!fields || typeof fields !== 'object') {
+      return res.status(400).json({ error: 'Missing or invalid "fields" object in request body.' })
+    }
 
     const response = await axios.post(
-      airtableEndpoint,
-      { fields },
-      { headers: airtableHeaders }
-    )
-
-    res.status(200).json(response.data)
-  } catch (error) {
-    console.error('Airtable error:', error.response?.data || error.message)
-    res.status(500).json({ error: error.response?.data || error.message })
-  }
-})
-
-app.get('/', (req, res) => {
-  res.send('API de contactos operativa en Render.')
-})
-
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-  console.log(`Servidor activo en puerto ${PORT}`)
-})
-
+      airtableUrl,
