@@ -72,4 +72,19 @@ app.delete('/contactos/:recordId', async (req, res) => {
     });
     res.status(200).json({ message: 'Contacto eliminado.', data: response.data });
   } catch (error) {
-    res.status(500).json({ error: er
+    res.status(500).json({ error: error.response?.data || error.message });
+  }
+});
+
+// Endpoints placeholder
+app.post('/contactos/duplicados', (req, res) => res.json({ message: 'Detectar duplicados no implementado aún.' }));
+app.post('/Campanas/enviar', (req, res) => res.json({ message: 'Enviar campaña no implementado aún.' }));
+app.post('/Importar/excel', (req, res) => res.json({ message: 'Importar desde Excel no implementado aún.' }));
+app.post('/Importar/imagen', (req, res) => res.json({ message: 'Importar desde imagen no implementado aún.' }));
+app.post('/Datos/buscar', (req, res) => res.json({ message: 'Buscar datos externo no implementado aún.' }));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor iniciado en http://localhost:${PORT}`);
+});
+
