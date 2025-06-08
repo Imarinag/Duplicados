@@ -15,21 +15,22 @@ const BASE_ID = process.env.BASE_ID;
 const TABLE_NAME = process.env.AIRTABLE_TABLE_NAME || 'Contactos';
 const AIRTABLE_URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
 
-
-
 // Crear contacto
 app.post('/contactos', async (req, res) => {
   const { fields } = req.body;
+
   if (!fields || typeof fields !== 'object') {
     return res.status(400).json({ error: 'El cuerpo debe incluir un objeto "fields" válido.' });
   }
+
   try {
     const response = await axios.post(AIRTABLE_URL, { fields }, {
       headers: {
         Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       }
     });
+
     res.status(200).json({ message: 'Contacto creado exitosamente.', data: response.data });
   } catch (error) {
     res.status(500).json({ error: error.response?.data || error.message });
@@ -40,53 +41,20 @@ app.post('/contactos', async (req, res) => {
 app.get('/contactos', async (req, res) => {
   try {
     const response = await axios.get(AIRTABLE_URL, {
-      headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` }
-    });
-    res.status(200).json(response.data);
-  } catch (error) {
-    res.status(500).json({ error: error.response?.data || error.message });
-  }
-});
-
-// Actualizar contacto
-app.patch('/contactos/:recordId', async (req, res) => {
-  const { recordId } = req.params;
-  const { fields } = req.body;
-  try {
-    const response = await axios.patch(`${AIRTABLE_URL}/${recordId}`, { fields }, {
       headers: {
         Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
       }
     });
+
     res.status(200).json(response.data);
   } catch (error) {
     res.status(500).json({ error: error.response?.data || error.message });
   }
 });
-
-// Eliminar contacto
-app.delete('/contactos/:recordId', async (req, res) => {
-  const { recordId } = req.params;
-  try {
-    const response = await axios.delete(`${AIRTABLE_URL}/${recordId}`, {
-      headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` }
-    });
-    res.status(200).json({ message: 'Contacto eliminado.', data: response.data });
-  } catch (error) {
-    res.status(500).json({ error: error.response?.data || error.message });
-  }
-});
-
-// Endpoints placeholder
-app.post('/contactos/duplicados', (req, res) => res.json({ message: 'Detectar duplicados no implementado aún.' }));
-app.post('/Campanas/enviar', (req, res) => res.json({ message: 'Enviar campaña no implementado aún.' }));
-app.post('/Importar/excel', (req, res) => res.json({ message: 'Importar desde Excel no implementado aún.' }));
-app.post('/Importar/imagen', (req, res) => res.json({ message: 'Importar desde imagen no implementado aún.' }));
-app.post('/Datos/buscar', (req, res) => res.json({ message: 'Buscar datos externo no implementado aún.' }));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor iniciado en http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
 
