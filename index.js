@@ -10,7 +10,6 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Airtable config desde variables de entorno
 const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_ID } = process.env
 
 const airtableUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_ID}`
@@ -19,12 +18,38 @@ const headers = {
   'Content-Type': 'application/json',
 }
 
-// Ruta POST /contactos
 app.post('/contactos', async (req, res) => {
   try {
     const { fields } = req.body
+
     if (!fields || typeof fields !== 'object') {
       return res.status(400).json({ error: 'Missing or invalid "fields" object in request body.' })
     }
 
-    con
+    const response = await axios.post(
+      airtableUrl,
+      { fields },
+      { headers }
+    )
+
+    res.status(200).json({
+      message: 'Contacto creado correctamente en Airtable.',
+      airtableId: response.data.id,
+      createdTime: response.data.createdTime
+    })
+  } catch (error) {
+    const status = error.response?.status || 500
+    const message = error.response?.data || error.message
+    console.error('Error al insertar en Airtable:', message)
+    res.status(status).json({ error: message })
+  }
+})
+
+app.get('/', (req, res) => {
+  res.send('API de creación de contactos conectada a Airtable.')
+})
+
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+  console.log(`Servidor activo en puerto ${PORT}`)
+})
