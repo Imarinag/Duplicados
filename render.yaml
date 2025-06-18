@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: duplicados-ok
+    name: duplicados-api
     env: node
     plan: free
     buildCommand: "npm install"
-    startCommand: "node index.js"
+    startCommand: "npm start"
     autoDeploy: true
     envVars:
       - key: AIRTABLE_API_KEY
@@ -13,3 +13,5 @@ services:
         value: app5UnTdKfNX1VAhm
       - key: AIRTABLE_TABLE_NAME
         value: Contactos
+      - key: PORT
+        value: 3000
